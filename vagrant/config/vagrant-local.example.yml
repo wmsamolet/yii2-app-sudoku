@@ -4,13 +4,13 @@
 github_token: <your-personal-github-token>
 
 # Guest OS timezone
-timezone: Europe/London
+timezone: Europe/Moscow
 
 # Are we need check box updates for every 'vagrant up'?
 box_check_update: false
 
 # Virtual machine name
-machine_name: y2aa
+machine_name: sudoku
 
 # Virtual machine IP
 ip: 192.168.83.137
