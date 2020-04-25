@@ -42,6 +42,26 @@ This way is the easiest but long (~20 min).
    php yii sudoku/server/listen
    ```
    
+6. Open website in browser and sign in:
+   ```bash
+    http://sudoku.local/
+   
+    Login: player1
+    Password: player
+   
+    Login: player2
+    Password: player
+    
+    Login: player3
+    Password: player
+    
+    Login: player4
+    Password: player
+    
+    Login: player5
+    Password: player
+   ```
+   
 That's all. You just need to wait for completion! After that you can access project locally by URLs:
 * frontend: http://sudoku.local/
 * backend: http://admin.sudoku.local/
@@ -74,6 +94,26 @@ That's all. You just need to wait for completion! After that you can access proj
    vagrant ssh
    cd /app
    php yii sudoku/server/listen
+   ```
+   
+6. Open website in browser and sign in:
+   ```bash
+    http://sudoku.local/
+   
+    Login: player1
+    Password: player
+   
+    Login: player2
+    Password: player
+    
+    Login: player3
+    Password: player
+    
+    Login: player4
+    Password: player
+    
+    Login: player5
+    Password: player
    ```
    
 That's all. You just need to wait for completion! After that you can access project locally by URLs:
