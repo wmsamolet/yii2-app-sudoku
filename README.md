@@ -34,6 +34,13 @@ This way is the easiest but long (~20 min).
    ```bash
    vagrant up
    ```
+6. Connect to vagrant by ssh and start sudoku websocket server:
+
+   ```bash
+   vagrant ssh
+   cd /app
+   php yii sudoku/server/listen
+   ```
    
 That's all. You just need to wait for completion! After that you can access project locally by URLs:
 * frontend: http://sudoku.local/
@@ -61,6 +68,14 @@ That's all. You just need to wait for completion! After that you can access proj
    
    (You can read [here](http://www.wikihow.com/Change-Directories-in-Command-Prompt) how to change directories in command prompt) 
 
+8. Connect to vagrant by ssh and start sudoku websocket server:
+
+   ```bash
+   vagrant ssh
+   cd /app
+   php yii sudoku/server/listen
+   ```
+   
 That's all. You just need to wait for completion! After that you can access project locally by URLs:
 * frontend: http://sudoku.local/
 * backend: http://admin.sudoku.local/
