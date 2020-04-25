@@ -2,7 +2,7 @@
 
 source /app/vagrant/provision/common.sh
 
-#== Import script args ==
+#== Import script args ===
 
 timezone=$(echo "$1")
 

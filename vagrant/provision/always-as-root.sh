@@ -2,7 +2,7 @@
 
 source /app/vagrant/provision/common.sh
 
-#== Provision script ==
+#== Provision script ===
 
 info "Provision-script user: `whoami`"
 
