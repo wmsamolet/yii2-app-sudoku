@@ -1,5 +1,12 @@
 # Set the default behavior, in case people don't have core.autocrlf set.
-* text=auto
+*       text=auto
 
-# Declare files that will always have LF line endings on checkout.
-*.sh text eol=lf
+*.txt   text
+*.java  text diff=java
+*.xml   text diff=xml
+
+# Shell scripts require LF
+*.sh    text eol=lf
+
+# Batch scripts require CRLF
+*.bat   text eol=crlf
