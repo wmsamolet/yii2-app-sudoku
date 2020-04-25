@@ -78,6 +78,8 @@ class ServerController extends ConsoleController
             }
         });
 
+        echo "Server started!\n\n";
+
         $this->server->start();
 
         return ExitCode::OK;
