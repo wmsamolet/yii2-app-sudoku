@@ -1,0 +1,23 @@
+{
+    "name": "wmsamolet/php-json-rpc-2",
+    "description": "JSON-RPC 2.0 entities",
+    "type": "library",
+    "keywords": [
+        "jsonrpc 2"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Vitaly Samolet",
+            "email": "wmsamolet@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Wmsamolet\\PhpJsonRpc2\\": "src/"
+        }
+    }
+}

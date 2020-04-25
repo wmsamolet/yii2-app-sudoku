@@ -1,0 +1,32 @@
+{
+    "name": "wmsamolet/yii2-module-sudoku",
+    "description": "Yii2 Module sudoku",
+    "type": "yii2-extension",
+    "keywords": [
+        "package",
+        "sudoku",
+        "websocket",
+        "ratchet",
+        "example",
+        "yii2"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Vitaly Samolet",
+            "email": "wmsamolet@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.1.0",
+        "yiisoft/yii2": "~2.0.0",
+        "wmsamolet/yii2-tools": "*",
+        "abcaeffchen/sudoku-php": "~1.0.0",
+        "npm-asset/vue": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "wmsamolet\\yii2\\modules\\sudoku\\": "src/"
+        }
+    }
+}

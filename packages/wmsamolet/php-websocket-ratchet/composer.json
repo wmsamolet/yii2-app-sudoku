@@ -1,0 +1,27 @@
+{
+    "name": "wmsamolet/php-websocket-ratchet",
+    "description": "PHP Websocket Server based on cboden/ratchet",
+    "type": "library",
+    "keywords": [
+        "websocket",
+        "server",
+        "ratchet"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Vitaly Samolet",
+            "email": "wmsamolet@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.1.0",
+        "wmsamolet/php-websocket": "*",
+        "cboden/ratchet": "^0.4.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Wmsamolet\\PhpWebsocket\\Ratchet\\": "src/"
+        }
+    }
+}

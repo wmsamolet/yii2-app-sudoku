@@ -1,0 +1,19 @@
+<meta charset="utf-8">
+<title>Sudoku demo</title>
+<script src="https://unpkg.com/vue"></script>
+<script src="./Sudoku.umd.js"></script>
+
+<link rel="stylesheet" href="./Sudoku.css">
+
+
+<div id="app">
+  <demo></demo>
+</div>
+
+<script>
+new Vue({
+  components: {
+    demo: Sudoku
+  }
+}).$mount('#app')
+</script>

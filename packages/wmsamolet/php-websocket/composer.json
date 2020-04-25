@@ -1,0 +1,24 @@
+{
+    "name": "wmsamolet/php-websocket",
+    "description": "PHP Websocket Server",
+    "type": "library",
+    "keywords": [
+        "websocket",
+        "server"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Vitaly Samolet",
+            "email": "wmsamolet@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Wmsamolet\\PhpWebsocket\\": "src/"
+        }
+    }
+}

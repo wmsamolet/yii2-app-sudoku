@@ -1,0 +1,24 @@
+{
+    "name": "wmsamolet/php-collections",
+    "description": "Package php collections",
+    "type": "library",
+    "keywords": [
+        "package",
+        "collections"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Vitaly Samolet",
+            "email": "wmsamolet@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Wmsamolet\\PhpCollections\\": "src/"
+        }
+    }
+}
