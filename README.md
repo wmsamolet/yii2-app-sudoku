@@ -17,8 +17,8 @@ This way is the easiest but long (~20 min).
 3. Prepare project:
    
    ```bash
-   git clone https://github.com/yiisoft/yii2-app-advanced.git
-   cd yii2-app-advanced/vagrant/config
+   git clone git@github.com:wmsamolet/yii2-app-sudoku.git
+   cd yii2-app-sudoku/vagrant/config
    cp vagrant-local.example.yml vagrant-local.yml
    ```
    
@@ -26,7 +26,7 @@ This way is the easiest but long (~20 min).
 5. Change directory to project root:
 
    ```bash
-   cd yii2-app-advanced
+   cd yii2-app-sudoku
    ```
 
 5. Run command:
@@ -36,8 +36,8 @@ This way is the easiest but long (~20 min).
    ```
    
 That's all. You just need to wait for completion! After that you can access project locally by URLs:
-* frontend: http://y2aa-frontend.test
-* backend: http://y2aa-backend.test
+* frontend: http://sudoku.local/
+* backend: http://admin.sudoku.local/
    
 #### Manual for Windows users
 
@@ -46,9 +46,9 @@ That's all. You just need to wait for completion! After that you can access proj
 3. Reboot
 4. Create GitHub [personal API token](https://github.com/blog/1509-personal-api-tokens)
 5. Prepare project:
-   * download repo [yii2-app-advanced](https://github.com/yiisoft/yii2-app-advanced/archive/master.zip)
+   * download repo [yii2-app-sudoku](https://github.com/wmsamolet/yii2-app-sudoku/archive/master.zip)
    * unzip it
-   * go into directory `yii2-app-advanced-master/vagrant/config`
+   * go into directory `yii2-app-sudoku-master/vagrant/config`
    * copy `vagrant-local.example.yml` to `vagrant-local.yml`
 
 6. Place your GitHub personal API token to `vagrant-local.yml`
@@ -70,6 +70,7 @@ DIRECTORY STRUCTURE
 
 ```
 common
+    bootstrap/           contains bootstrap classes (DI container)
     config/              contains shared configurations
     mail/                contains view files for e-mails
     models/              contains model classes used in both backend and frontend
@@ -101,4 +102,6 @@ apps/frontend
     widgets/             contains frontend widgets
 vendor/                  contains dependent 3rd-party packages
 environments/            contains environment-based overrides
+packages/                
+    wmsamolet/           contains self-written packages (wmsamolet/*)
 ```
