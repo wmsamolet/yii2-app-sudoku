@@ -98,10 +98,10 @@ export PATH="$(yarn global bin):$PATH"
 info "Install globally @vue/cli @vue/cli-service-global"
 yarn global add @vue/cli @vue/cli-service-global
 
-info "Installing MailCatcher"
-gem update --system
-gem install mailcatcher
+#info "Installing MailCatcher"
+#gem update --system
+#gem install mailcatcher
 
-info "Configuring MailCatcher"
-sed -i "s~;sendmail_path =~sendmail_path = /usr/bin/env catchmail -f noreply@sudoku.local~" /etc/php/7.2/fpm/php.ini
-sed -i "s~;sendmail_path =~sendmail_path = /usr/bin/env catchmail -f noreply@sudoku.local~" /etc/php/7.2/cli/php.ini
+#info "Configuring MailCatcher"
+#sed -i "s~;sendmail_path =~sendmail_path = /usr/bin/env catchmail -f noreply@sudoku.local~" /etc/php/7.2/fpm/php.ini
+#sed -i "s~;sendmail_path =~sendmail_path = /usr/bin/env catchmail -f noreply@sudoku.local~" /etc/php/7.2/cli/php.ini

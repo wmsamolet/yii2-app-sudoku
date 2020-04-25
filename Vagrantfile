@@ -76,10 +76,10 @@ Vagrant.configure(2) do |config|
     config.vm.provision 'shell', path: './vagrant/provision/always-as-root.sh', run: 'always'
 
     # run MailCatcher
-    config.vm.provision "shell", run: "always" do |s|
-        s.inline = "mailcatcher --ip=0.0.0.0"
-        config.vm.network :forwarded_port, guest: 1080, host: 1080, host_ip: "127.0.0.1"
-    end
+    # config.vm.provision "shell", run: "always" do |s|
+    #     s.inline = "mailcatcher --ip=0.0.0.0"
+    #     config.vm.network :forwarded_port, guest: 1080, host: 1080, host_ip: "127.0.0.1"
+    # end
 
     # post-install message (vagrant console)
     config.vm.post_up_message = "Frontend URL: http://#{domains[:frontend]}\nBackend URL: http://#{domains[:backend]}"
