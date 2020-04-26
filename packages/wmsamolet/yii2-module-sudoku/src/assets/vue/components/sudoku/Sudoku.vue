@@ -37,16 +37,20 @@
         </div>
         <div class="col-md-6">
 
-            <div><b>Filled cells:</b> {{ cells.filled }}</div>
-            <div><b>Empty cells:</b> {{ cells.empty }}</div>
+            <div><b>Filled cells:</b> {{ cellsFilled }}</div>
+            <div><b>Empty cells:</b> {{ cellsEmpty }}</div>
 
-            <br/><br/>
+            <br/>
 
             <div class="sudoku-log">
                 <div v-for="(message, index) in messages"
                      v-bind:key="index"
+                     v-bind:class="'sudoku-log-message-' + message.type"
                 >
-                    {{ message }}
+                    <span v-if="message.date">[{{ message.date }}]:</span>
+                    <span v-if="message.code">[{{ message.code }}]:</span>
+
+                    {{ message.text }}
                 </div>
             </div>
 
@@ -90,8 +94,10 @@
         connection.send(data);
     };
 
-    connectionSuccessMessages.updateMatrix = function (result, that) {
+    connectionSuccessMessages.updateGameData = function (result, that) {
         that.matrix = result.matrix;
+        that.cellsFilled = result.cellsFilled;
+        that.cellsEmpty = result.cellsEmpty;
     };
 
     connectionSuccessMessages.showWinner = function (result) {
@@ -126,10 +132,8 @@
             return {
                 messages: [],
                 matrix: [],
-                cells: {
-                    filled: 0,
-                    empty: 0
-                }
+                cellsFilled: 0,
+                cellsEmpty: 0
             }
         },
         created() {
@@ -144,6 +148,7 @@
 
             connection.onmessage = function (e) {
                 let data = JSON.parse(e.data);
+                let date = data.date ?? null;
 
                 console.log('Server response:', data);
 
@@ -153,7 +158,13 @@
                     }
 
                     if (data.result.message) {
-                        that.messages.push(data.result.message);
+                        let messageType = data.result.messageType ?? 'info';
+
+                        that.messages.unshift({
+                            type: messageType,
+                            text: data.result.message,
+                            date: date
+                        });
                     }
                 }
                 else if (data.error) {
@@ -161,6 +172,15 @@
 
                     if (data.id && connectionErrorMessages[data.id]) {
                         connectionErrorMessages[data.id](data.error, that);
+                    }
+
+                    if (data.error.message) {
+                        that.messages.unshift({
+                            type: 'error',
+                            text: data.error.message,
+                            code: data.error.code,
+                            date: date
+                        });
                     }
                 }
                 else {
@@ -178,7 +198,8 @@
                         [that.gameId],
                         function (result) {
                             that.matrix = result.matrix;
-                            that.cells = result.cells;
+                            that.cellsFilled = result.cellsFilled;
+                            that.cellsEmpty = result.cellsEmpty;
                         }
                     )
                 })
@@ -191,12 +212,10 @@
                     [that.gameId, cellId, parseInt(value)],
                     function (result) {
                         that.matrix = result.matrix;
-                        that.cells = result.cells;
+                        that.cellsFilled = result.cellsFilled;
+                        that.cellsEmpty = result.cellsEmpty;
                     }
                 )
-            },
-            validateValue(value) {
-                return value.match(/^\d+$/)
             }
         }
     }
@@ -206,6 +225,21 @@
     .sudoku-log {
         max-height: 300px;
         overflow-y: scroll;
+    }
+
+    .sudoku-log-message-warning {
+        font-weight: bold;
+        color: #ee8700;
+    }
+
+    .sudoku-log-message-success {
+        font-weight: bold;
+        color: #128700;
+    }
+
+    .sudoku-log-message-error {
+        font-weight: bold;
+        color: #be0015;
     }
 
     .wrapper-sudoku * {

@@ -55,10 +55,9 @@ class ServerService
         $this->sendResponse($serverClient, [
             'message' => Yii::t(
                 SudokuModule::T_CATEGORY,
-                'Player with id#{playerId} ({clientId}) authorized successfully!',
+                'Player with id#{playerId} authorized successfully!',
                 [
                     'playerId' => $playerId,
-                    'clientId' => $serverClient->getId(),
                 ]
             ),
         ]);
@@ -71,58 +70,17 @@ class ServerService
         int $gameId
     ): void {
         $matrix = $this->getFilledGameMatrix($gameId);
-        $cellsFilled = $this->gameMatrixService->count($matrix);
-        $cellsEmpty = $this->gameMatrixService->count($matrix, false);
-
-        $this->sendResponse($serverClient, [
-            'matrix' => $matrix,
-            'cells' => [
-                'filled' => $cellsFilled,
-                'empty' => $cellsEmpty,
-            ],
-        ]);
-
         $playerId = $this->getClientUserId($serverClient);
-        $messages = [];
-        $messages[] = Yii::t(
+        $message = Yii::t(
             SudokuModule::T_CATEGORY,
-            'Player id#{playerId} ({clientId}) connected to the game',
+            'Player id#{playerId} connected to the game',
             [
                 'playerId' => $playerId,
-                'clientId' => $serverClient->getId(),
             ]
         );
 
-        if ($cellsEmpty === 0) {
-            $game = $this->gameService->getById($gameId);
-            $gameMovement = $this->gameMoveService->getLastOkMovement($gameId);
-            $winnerPlayerId = $gameMovement->player_id;
-
-            if (!$game->winner_player_id) {
-                $this->gameService->update($gameId, ['winner_player_id' => $winnerPlayerId]);
-            }
-
-            $messages[] = Yii::t(
-                SudokuModule::T_CATEGORY,
-                'Game finished! Winner: player id#{winnerPlayerId}',
-                [
-                    'winnerPlayerId' => $winnerPlayerId,
-                ]
-            );
-
-            $this->sendResponse($serverClient, [
-                'winnerPlayerId' => $winnerPlayerId,
-            ], 'showWinner');
-        }
-
-        foreach ($messages as $message) {
-            /** @var ServerClientInterface $otherServerClient */
-            foreach ($serverClient->getServer()->getClients() as $otherServerClient) {
-                $this->sendResponse($otherServerClient, [
-                    'message' => $message,
-                ]);
-            }
-        }
+        $this->updatePlayersGameData($serverClient, $gameId, $matrix, $message);
+        $this->checkWinner($serverClient, $gameId, $matrix);
     }
 
     public function makeAMove(
@@ -131,28 +89,25 @@ class ServerService
         int $cellId,
         int $cellValue
     ): void {
+        $matrix = $this->getFilledGameMatrix($gameId);
         $playerId = $this->getClientUserId($serverClient);
         $cellStatus = (int)$this->gameService->checkMove($gameId, $cellId, $cellValue);
 
-        $matrix = $this->getFilledGameMatrix($gameId);
-        $cellsFilled = $this->gameMatrixService->count($matrix);
-        $cellsEmpty = $this->gameMatrixService->count($matrix, false);
-
-        if ($cellsEmpty > 0) {
-            $this->gameMoveService->make($gameId, $cellId, $cellValue, $cellStatus, $playerId);
-
-            $matrix = $this->getFilledGameMatrix($gameId);
-            $cellsFilled = $this->gameMatrixService->count($matrix);
-            $cellsEmpty = $this->gameMatrixService->count($matrix, false);
+        if ($this->checkWinner($serverClient, $gameId, $matrix)) {
+            return;
         }
 
-        $messages = [];
-        $messages[] = Yii::t(
+        $this->gameMoveService->make($gameId, $cellId, $cellValue, $cellStatus, $playerId);
+
+        if ($cellStatus === $this->gameMoveService::CELL_STATUS_OK) {
+            $matrix = $this->gameMatrixService->setCellValue($matrix, $cellId, $cellValue, $playerId);
+        }
+
+        $message = Yii::t(
             SudokuModule::T_CATEGORY,
-            'Player id#{playerId} ({clientId}) made a {right} movement in the field {cellId} with value {cellValue}',
+            'Player id#{playerId} made a {right} movement in the field {cellId} with value {cellValue}',
             [
                 'playerId' => $playerId,
-                'clientId' => $serverClient->getId(),
                 'cellId' => $cellId,
                 'cellValue' => $cellValue,
                 'right' => $cellStatus
@@ -161,45 +116,13 @@ class ServerService
             ]
         );
 
-        if ($cellsEmpty === 0) {
-            $gameMovement = $this->gameMoveService->getLastOkMovement($gameId);
-            $winnerPlayerId = $gameMovement->player_id;
-
-            $this->gameService->update($gameId, ['winner_player_id' => $winnerPlayerId]);
-
-            $messages[] = Yii::t(
-                SudokuModule::T_CATEGORY,
-                'Game finished! Winner: player id#{winnerPlayerId}',
-                [
-                    'winnerPlayerId' => $winnerPlayerId,
-                ]
-            );
-
-            /** @var ServerClientInterface $otherServerClient */
-            foreach ($serverClient->getServer()->getClients() as $otherServerClient) {
-                $this->sendResponse($otherServerClient, [
-                    'winnerPlayerId' => $winnerPlayerId,
-                ], 'showWinner');
-            }
-        }
-
-        foreach ($messages as $message) {
-            /** @var ServerClientInterface $otherServerClient */
-            foreach ($serverClient->getServer()->getClients() as $otherServerClient) {
-                $this->sendResponse(
-                    $otherServerClient,
-                    [
-                        'message' => $message,
-                        'matrix' => $matrix,
-                        'cells' => [
-                            'filled' => $cellsFilled,
-                            'empty' => $cellsEmpty,
-                        ],
-                    ],
-                    'updateMatrix'
-                );
-            }
-        }
+        $this->updatePlayersGameData(
+            $serverClient,
+            $gameId,
+            $matrix,
+            $message,
+            $cellStatus === $this->gameMoveService::CELL_STATUS_OK ? 'success' : 'warning'
+        );
     }
 
     public function onOpenConnection(ServerClientInterface $serverClient): void
@@ -215,10 +138,9 @@ class ServerService
             $this->sendResponse($otherServerClient, [
                 'message' => Yii::t(
                     SudokuModule::T_CATEGORY,
-                    'Player id#{playerId} ({clientId}) connected',
+                    'Player id#{playerId} connected',
                     [
                         'playerId' => $playerId,
-                        'clientId' => $serverClient->getId(),
                     ]
                 ),
             ]);
@@ -238,10 +160,9 @@ class ServerService
             $this->sendResponse($otherServerClient, [
                 'message' => Yii::t(
                     SudokuModule::T_CATEGORY,
-                    'Player id#{playerId} ({clientId}) disconnected',
+                    'Player id#{playerId} disconnected',
                     [
                         'playerId' => $playerId,
-                        'clientId' => $serverClient->getId(),
                     ]
                 ),
             ]);
@@ -288,7 +209,8 @@ class ServerService
             $serverClient->getStorage()->offsetUnset(JsonRpc2Request::class);
         }
 
-        $response = new JsonRpc2Response($data, $requestId);
+        $response = (new JsonRpc2Response($data, $requestId))
+            ->addData(['date' => date('Y-m-d H:i:s')]);
 
         echo "Send response to #{$serverClient->getId()}: {$response}\n\n";
 
@@ -309,12 +231,71 @@ class ServerService
         }
 
         return $serverClient->sendMessage(
-            (new JsonRpc2ErrorResponse(
-                $errorCode,
-                $errorMessage,
-                $requestId
-            ))->setData($errorData)
+            (new JsonRpc2ErrorResponse($errorCode, $errorMessage, $requestId))
+                ->addData(['date' => date('Y-m-d H:i:s')])
+                ->addData($errorData)
         );
+    }
+
+    protected function checkWinner(
+        ServerClientInterface $serverClient,
+        int $gameId,
+        array $matrix
+    ): bool {
+        if ($this->gameMatrixService->count($matrix, false) > 0) {
+            return false;
+        }
+
+        $gameMovement = $this->gameMoveService->getLastOkMovement($gameId);
+        $winnerPlayerId = $gameMovement->player_id;
+
+        $this->gameService->update($gameId, ['winner_player_id' => $winnerPlayerId]);
+
+        $message = Yii::t(
+            SudokuModule::T_CATEGORY,
+            'Game finished! Winner: player id#{winnerPlayerId}',
+            [
+                'winnerPlayerId' => $winnerPlayerId,
+            ]
+        );
+
+        /** @var ServerClientInterface $otherServerClient */
+        foreach ($serverClient->getServer()->getClients() as $otherServerClient) {
+            $this->sendResponse($otherServerClient, [
+                'message' => $message,
+                'messageType' => 'success',
+                'winnerPlayerId' => $winnerPlayerId,
+            ], 'showWinner');
+        }
+
+        return true;
+    }
+
+    protected function updatePlayersGameData(
+        ServerClientInterface $serverClient,
+        int $gameId,
+        array $matrix = null,
+        string $message = null,
+        string $messageType = 'info'
+    ): void {
+        $matrix = $matrix ?? $this->getFilledGameMatrix($gameId);
+        $cellsFilled = $this->gameMatrixService->count($matrix);
+        $cellsEmpty = $this->gameMatrixService->count($matrix, false);
+
+        /** @var ServerClientInterface $otherServerClient */
+        foreach ($serverClient->getServer()->getClients() as $otherServerClient) {
+            $this->sendResponse(
+                $otherServerClient,
+                [
+                    'message' => $message,
+                    'messageType' => $messageType,
+                    'matrix' => $matrix,
+                    'cellsFilled' => $cellsFilled,
+                    'cellsEmpty' => $cellsEmpty,
+                ],
+                'updateGameData'
+            );
+        }
     }
 
     protected function setClientUserData(ServerClientInterface $serverClient, array $data = []): self

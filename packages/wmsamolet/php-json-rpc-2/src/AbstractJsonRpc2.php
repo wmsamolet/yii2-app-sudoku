@@ -12,6 +12,13 @@ abstract class AbstractJsonRpc2
         return $this->data;
     }
 
+    public function addData(array $data): self
+    {
+        $this->data = array_merge_recursive($this->data, $data);
+
+        return $this;
+    }
+
     public function setData(array $data): self
     {
         $this->data = $data;
